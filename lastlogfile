@@ -1,0 +1,798 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h1><strong><span style=\"color: #993300;\">Python Class Project #1</span></strong></h1>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h1><span style=\"color: #003300;\">Last Log File Analysis</span></h1>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    " <h2><span style=\"color: #339966;\"><span style=\"color: #003300;\">■ Project Description</span></span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(1) last log format</span></span></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "[username], [tty], [IP address], [login time], [used time]\n",
+    "\n",
+    "<pre>da14     pts/0        220.149.189.37   Wed Apr 12 17:46 - 17:53  (00:06)\n",
+    "da14     pts/0        220.149.189.37   Wed Apr 12 17:45 - 17:46  (00:01)\n",
+    "da14     pts/0        220.149.189.37   Wed Apr 12 17:44 - 17:45  (00:00)</pre>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(2) Information that we want to retrieve from the last log file</span></span></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "0. login count [total count, count of certain period]\n",
+    "\n",
+    "    'da01' : 24 times logins <br>\n",
+    "    'da01' : 12 times logins in Apr. 2017<br>\n",
+    "    \n",
+    "0. loginned IP address by a user\n",
+    "\n",
+    "    'da01'\n",
+    "        [220.149.189.xx]\n",
+    "        [11.66.255.xx]\n",
+    "        ...\n",
+    "0. Used time [user, total time of all users ]\n",
+    "\n",
+    "    'da01' : 24 hours <br>\n",
+    "    'da01' : 12 hours in Apr. 2017\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h2><span style=\"color: #339966;\"><span style=\"color: #003300;\">■ Warming Up for Last log file</span></span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "0. save the last command result as a log file 'last.log'\n",
+    "0. open the 'last.log'\n",
+    "0. read each line from the 'last.log' file and split by blank\n",
+    "0. make split each field as a variable for a record"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "kwool    pts/1        220.149.189.82   Fri Apr 14 11:29   still logged in\n",
+      "\n",
+      "kwool    pts/0        220.149.189.82   Fri Apr 14 10:29   still logged in\n",
+      "\n",
+      "da22     pts/4        59.29.186.109    Thu Apr 13 15:12 - 15:21  (00:09)\n",
+      "\n",
+      "da22     pts/4        59.29.186.109    Thu Apr 13 15:10 - 15:12  (00:01)\n",
+      "\n",
+      "da14     pts/5        220.149.189.37   Thu Apr 13 14:37 - 14:41  (00:03)\n",
+      "\n",
+      "da22     pts/4        59.29.186.109    Thu Apr 13 14:29 - 14:42  (00:12)\n",
+      "\n",
+      "kwool    pts/0        220.149.189.82   Tue Oct  4 16:52 - 11:13 (7+18:20)\n",
+      "\n",
+      "kwool    pts/0        220.149.189.82   Tue Jul  5 21:10 - 17:58 (8+20:48)\n",
+      "\n",
+      "fp04     pts/3        211.36.131.203   Wed Jun 29 07:31 - 07:36  (00:05)\n",
+      "\n",
+      "fp22     pts/0        121.158.184.242  Thu Jun 16 09:06 - 09:50  (00:43)\n",
+      "\n",
+      "fp26     pts/0        211.33.160.47    Thu Jun 16 08:28 - 08:45  (00:17)\n",
+      "\n",
+      "fp23     pts/1        115.86.134.56    Thu Jun 16 07:35 - 07:35  (00:00)\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "with open('last.log') as f:\n",
+    "    for line in f:\n",
+    "        print line"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "rean line and split eache filed and make it as a recored field"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "prof pts/1 220.149.xxx.xxx Fri Apr 14 in\n",
+      "prof pts/0 220.149.xxx.xxx Fri Apr 14 in\n",
+      "da22 pts/4 59.29.186.109 Thu Apr 13 (00:09)\n",
+      "da22 pts/4 59.29.186.109 Thu Apr 13 (00:01)\n",
+      "da14 pts/5 220.149.xxx.37 Thu Apr 13 (00:03)\n",
+      "da22 pts/4 59.29.186.109 Thu Apr 13 (00:12)\n",
+      "prof pts/0 220.149.xxx.xxx Tue Oct 4 (7+18:20)\n",
+      "prof pts/0 220.149.xxx.xxx Tue Jul 5 (8+20:48)\n",
+      "fp04 pts/3 211.36.131.203 Wed Jun 29 (00:05)\n",
+      "fp22 pts/0 121.158.184.242 Thu Jun 16 (00:43)\n",
+      "fp26 pts/0 211.33.160.47 Thu Jun 16 (00:17)\n",
+      "fp23 pts/1 115.86.134.56 Thu Jun 16 (00:00)\n"
+     ]
+    }
+   ],
+   "source": [
+    "with open('last.log') as f:\n",
+    "    for line in f:\n",
+    "        uname, tty, ipaddr, day, month, date, _, _, _, utimestr = line.split()\n",
+    "        print uname, tty, ipaddr, day, month, date, utimestr"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h2><span style=\"color: #000000;\">■&nbsp;Record Management</span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<img src='http://www.clipular.com/c/6568273136320512.png?k=EHCKLiBo3rEVLHNcIU6eglMDNAE'  width=\"640\">"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h2><span style=\"color: #000000;\">■&nbsp;Implementation</span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(1)&nbsp;Construct the list of dictionaries</span></span></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Step 1 : save the last command result as a log file 'last.log' and open that file"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Step 2 : read each line from a file and split the filed of log file. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Step 3 : used time calculation\n",
+    "        [case 1] General format              00:00 - 00:04 (00:02)\n",
+    "        [case 2] still logged in             still logged in \n",
+    "        [case 3] more the one day            (1+16:12)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Step 4 : make a dictionary that has the value from each split field"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Step 5 : Applend the dictionary into a list "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'date': {'date': '14', 'day': 'Fri', 'month': 'Apr'}, 'uname': 'prof', 'tty': 'pts/1', 'ipaddr': '220.149.xxx.xxx', 'utime': 0}\n",
+      "{'date': {'date': '14', 'day': 'Fri', 'month': 'Apr'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 0}\n",
+      "{'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 9}\n",
+      "{'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 1}\n",
+      "{'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da14', 'tty': 'pts/5', 'ipaddr': '220.149.xxx.37', 'utime': 3}\n",
+      "{'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 12}\n",
+      "{'date': {'date': '4', 'day': 'Tue', 'month': 'Oct'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 11180}\n",
+      "{'date': {'date': '5', 'day': 'Tue', 'month': 'Jul'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 12768}\n",
+      "{'date': {'date': '29', 'day': 'Wed', 'month': 'Jun'}, 'uname': 'fp04', 'tty': 'pts/3', 'ipaddr': '211.36.131.203', 'utime': 5}\n",
+      "{'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp22', 'tty': 'pts/0', 'ipaddr': '121.158.184.242', 'utime': 43}\n",
+      "{'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp26', 'tty': 'pts/0', 'ipaddr': '211.33.160.47', 'utime': 17}\n",
+      "{'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp23', 'tty': 'pts/1', 'ipaddr': '115.86.134.56', 'utime': 0}\n",
+      "the number of records 12\n",
+      "[{'date': {'date': '14', 'day': 'Fri', 'month': 'Apr'}, 'uname': 'prof', 'tty': 'pts/1', 'ipaddr': '220.149.xxx.xxx', 'utime': 0}, {'date': {'date': '14', 'day': 'Fri', 'month': 'Apr'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 0}, {'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 9}, {'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 1}, {'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da14', 'tty': 'pts/5', 'ipaddr': '220.149.xxx.37', 'utime': 3}, {'date': {'date': '13', 'day': 'Thu', 'month': 'Apr'}, 'uname': 'da22', 'tty': 'pts/4', 'ipaddr': '59.29.186.109', 'utime': 12}, {'date': {'date': '4', 'day': 'Tue', 'month': 'Oct'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 11180}, {'date': {'date': '5', 'day': 'Tue', 'month': 'Jul'}, 'uname': 'prof', 'tty': 'pts/0', 'ipaddr': '220.149.xxx.xxx', 'utime': 12768}, {'date': {'date': '29', 'day': 'Wed', 'month': 'Jun'}, 'uname': 'fp04', 'tty': 'pts/3', 'ipaddr': '211.36.131.203', 'utime': 5}, {'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp22', 'tty': 'pts/0', 'ipaddr': '121.158.184.242', 'utime': 43}, {'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp26', 'tty': 'pts/0', 'ipaddr': '211.33.160.47', 'utime': 17}, {'date': {'date': '16', 'day': 'Thu', 'month': 'Jun'}, 'uname': 'fp23', 'tty': 'pts/1', 'ipaddr': '115.86.134.56', 'utime': 0}]\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "lastlist = []  # Initailize the list of dictionaries\n",
+    "\n",
+    "\n",
+    "with open('last.log') as f:\n",
+    "    for line in f:\n",
+    "        uname, tty, ipaddr, day, month, date, _,_,_, usedtimestr = line.split()\n",
+    "        if usedtimestr != 'in':\n",
+    "            hours, mins = usedtimestr.split(':')\n",
+    "            hours = hours.lstrip('(')\n",
+    "            if '+' in hours:\n",
+    "                d, h = hours.split('+')\n",
+    "                hours = int(d) * 24 + int(h)\n",
+    "            mins = mins.rstrip(')')\n",
+    "        else:\n",
+    "            hours = mins = 0\n",
+    "        utime = int(hours) * 60 + int(mins)\n",
+    "        \n",
+    "        record_n = {'uname':uname, 'tty':tty, 'ipaddr':ipaddr, 'date': {'day':day, 'month':month, 'date':date}, 'utime': utime}\n",
+    "        print record_n\n",
+    "        lastlist.append(record_n)\n",
+    "\n",
+    "print 'the number of records', len(lastlist)\n",
+    "print lastlist\n",
+    "        "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(2)&nbsp;Print record information of a certain user or all users </span></span></h3>\n",
+    "\n",
+    "<img src=\"http://www.clipular.com/c/5574850690416640.png?k=urdRZ7jm37zvU2tMuiHL2koEtn0\" width=\"340\">"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "da22\n",
+      "\t\t59.29.186.109 Thu Apr 13 pts/4 0 hours 9 mins\n",
+      "\t\t59.29.186.109 Thu Apr 13 pts/4 0 hours 1 mins\n",
+      "\t\t59.29.186.109 Thu Apr 13 pts/4 0 hours 12 mins\n",
+      "----------------------------------------------------------------------------------------------------\n",
+      "prof \t220.149.xxx.xxx \tFri Apr 14 pts/1 \t0 hours 0 mins\n",
+      "prof \t220.149.xxx.xxx \tFri Apr 14 pts/0 \t0 hours 0 mins\n",
+      "da22 \t59.29.186.109 \tThu Apr 13 pts/4 \t0 hours 9 mins\n",
+      "da22 \t59.29.186.109 \tThu Apr 13 pts/4 \t0 hours 1 mins\n",
+      "da14 \t220.149.xxx.37 \tThu Apr 13 pts/5 \t0 hours 3 mins\n",
+      "da22 \t59.29.186.109 \tThu Apr 13 pts/4 \t0 hours 12 mins\n",
+      "prof \t220.149.xxx.xxx \tTue Oct 4 pts/0 \t186 hours 20 mins\n",
+      "prof \t220.149.xxx.xxx \tTue Jul 5 pts/0 \t212 hours 48 mins\n",
+      "fp04 \t211.36.131.203 \tWed Jun 29 pts/3 \t0 hours 5 mins\n",
+      "fp22 \t121.158.184.242 \tThu Jun 16 pts/0 \t0 hours 43 mins\n",
+      "fp26 \t211.33.160.47 \tThu Jun 16 pts/0 \t0 hours 17 mins\n",
+      "fp23 \t115.86.134.56 \tThu Jun 16 pts/1 \t0 hours 0 mins\n"
+     ]
+    }
+   ],
+   "source": [
+    "def print_records(uname=None):\n",
+    "    if uname is not None:\n",
+    "        found = 0\n",
+    "        for rec in lastlist:\n",
+    "            if rec['uname'] == uname:\n",
+    "                if not found: print rec['uname']\n",
+    "                found = 1\n",
+    "                print '\\t\\t', rec['ipaddr'], rec['date']['day'], rec['date']['month'], rec['date']['date'], rec['tty'], rec['utime']/60,'hours', rec['utime'] % 60, 'mins'\n",
+    "    else:\n",
+    "        for rec in lastlist:\n",
+    "            print rec['uname'], '\\t', rec['ipaddr'], '\\t', rec['date']['day'], rec['date']['month'], rec['date']['date'], rec['tty'], '\\t',rec['utime']/60,'hours', rec['utime'] % 60, 'mins'\n",
+    "    return None\n",
+    "\n",
+    "print_records('da22')\n",
+    "print '-' * 100\n",
+    "print_records()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(3)&nbsp;Data Retrieval 1 : logged in Count </span></span></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### (a) certain user without period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3\n"
+     ]
+    }
+   ],
+   "source": [
+    "# \n",
+    "# count the logged in number for the certain user account without specific period\n",
+    "#\n",
+    "def logincount(uname):\n",
+    "    lgcnt = 0\n",
+    "    if uname is not None:\n",
+    "        for rec in lastlist:\n",
+    "            if rec['uname'] == uname:\n",
+    "                lgcnt += 1\n",
+    "        return lgcnt\n",
+    "    else:\n",
+    "        return 0\n",
+    "\n",
+    "print logincount('da22')\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### (b) certain user with period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "4 times\n",
+      "1 times\n"
+     ]
+    }
+   ],
+   "source": [
+    "# \n",
+    "# count the logged in number for the certain user account with specific period\n",
+    "#\n",
+    "def logincount(uname, month=None):\n",
+    "    lgcnt = 0\n",
+    "    if uname is not None:\n",
+    "        if month is None:\n",
+    "            for rec in lastlist:\n",
+    "                if rec['uname'] == uname:\n",
+    "                    lgcnt += 1\n",
+    "            return lgcnt\n",
+    "        else:\n",
+    "            for rec in lastlist:\n",
+    "                if rec['uname'] == uname and rec['date']['month'] == month:\n",
+    "                    lgcnt += 1\n",
+    "            return lgcnt\n",
+    "    else:\n",
+    "        return 0\n",
+    "\n",
+    "print logincount('prof'), 'times'\n",
+    "print logincount('prof', 'Oct'), 'times'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### (c) All users without period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['prof', 'prof', 'da22', 'da22', 'da14', 'da22', 'prof', 'prof', 'fp04', 'fp22', 'fp26', 'fp23']\n",
+      "set(['da22', 'fp22', 'fp23', 'fp04', 'fp26', 'da14', 'prof'])\n",
+      "da22\n",
+      "user name : fp22 \t1 times\n",
+      "user name : fp23 \t1 times\n",
+      "user name : fp04 \t1 times\n",
+      "user name : fp26 \t1 times\n",
+      "user name : da14 \t1 times\n",
+      "user name : prof \t4 times\n"
+     ]
+    }
+   ],
+   "source": [
+    "allusers = list(d['uname'] for d in lastlist)\n",
+    "print allusers\n",
+    "\n",
+    "allusers = set(d['uname'] for d in lastlist)\n",
+    "print allusers\n",
+    "\n",
+    "def logincount_allusers():\n",
+    "    allusers = set(d['uname'] for d in lastlist)\n",
+    "    for username in allusers:\n",
+    "        lgcnt = 0\n",
+    "        for rec in lastlist:\n",
+    "            if username == rec['uname']:\n",
+    "                lgcnt += 1\n",
+    "        print 'user name :', username,  '\\t', lgcnt, 'times'\n",
+    "        \n",
+    "\n",
+    "logincount_allusers()\n",
+    "        \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "#### (d) All users with period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Allusers All Period\n",
+      "username : da22 \t3 times\n",
+      "username : fp22 \t1 times\n",
+      "username : fp23 \t1 times\n",
+      "username : fp04 \t1 times\n",
+      "username : fp26 \t1 times\n",
+      "username : da14 \t1 times\n",
+      "username : prof \t4 times\n",
+      "Allusers Certain Period\n",
+      "username : da22 \t3 times\n",
+      "username : fp22 \t0 times\n",
+      "username : fp23 \t0 times\n",
+      "username : fp04 \t0 times\n",
+      "username : fp26 \t0 times\n",
+      "username : da14 \t1 times\n",
+      "username : prof \t2 times\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "def logincount_allusers(month = None):\n",
+    "    allusers = set(d['uname'] for d in lastlist)\n",
+    "    for username in allusers:\n",
+    "        lgcnt = 0 \n",
+    "        for rec in lastlist:\n",
+    "            if username == rec['uname']:\n",
+    "                if month is None:\n",
+    "                    lgcnt += 1\n",
+    "                else:\n",
+    "                    if month == rec['date']['month']:\n",
+    "                        lgcnt += 1\n",
+    "        print 'username :', username, '\\t', lgcnt, 'times'\n",
+    "    return None\n",
+    "\n",
+    "print 'Allusers All Period'        \n",
+    "logincount_allusers()\n",
+    "print 'Allusers Certain Period'        \n",
+    "logincount_allusers('Apr')\n",
+    "        \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(4)&nbsp;Data Retrieval 2 : list of logged in Ip addresses </span></span></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A certain user's logged in ip addresses\n",
+    "<img src=\"http://www.clipular.com/c/4544000825753600.png?k=RZqi4MfKtWVNpJF509FxMjoVFkc\", width=\"480\">"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User :  da22\n",
+      "\t\t59.29.186.109\n",
+      "\t\t59.29.186.109\n",
+      "\t\t59.29.186.109\n"
+     ]
+    }
+   ],
+   "source": [
+    "def list_ipaddr(uname):\n",
+    "    iplist = []\n",
+    "    for rec in lastlist:\n",
+    "        if uname == rec['uname']:\n",
+    "            iplist.append(rec['ipaddr'])\n",
+    "    return iplist\n",
+    "\n",
+    "uname = 'da22'\n",
+    "iplist = list_ipaddr(uname)\n",
+    "print 'User : ', uname\n",
+    "for ip in iplist:\n",
+    "    print '\\t\\t', ip\n",
+    "    \n",
+    "            "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><span style=\"color: #339966;\"><span style=\"color: #003300;\">(5)&nbsp;Data Retrieval 3 : Total Used Time </span></span></h3>\n",
+    "<img src=\"http://www.clipular.com/c/6322819043688448.png?k=eZQ5TO3X14lJanTDZcjqKJtIDQo\" width=\"480\">"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "(a) Total used time by a user"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "user: da22 \t0 days 0 hours 22 mins\n",
+      "user: prof \t16 days 15 hours 8 mins\n"
+     ]
+    }
+   ],
+   "source": [
+    "def usedtime_user(uname):\n",
+    "    tusedtime = 0\n",
+    "    for rec in lastlist:\n",
+    "        if uname == rec['uname']:\n",
+    "            tusedtime += rec['utime']\n",
+    "    return tusedtime\n",
+    "\n",
+    "\n",
+    "\n",
+    "def splitmin(tutime):\n",
+    "    m = tutime % 60\n",
+    "    h = tutime/60\n",
+    "    d = h/24\n",
+    "    h = h % 24\n",
+    "    return d,h,m\n",
+    "\n",
+    "tutime = usedtime_user('da22')\n",
+    "d,h,m = splitmin(tutime)\n",
+    "print 'user:', 'da22', '\\t', d,'days', h,'hours', m, 'mins'\n",
+    "\n",
+    "\n",
+    "tutime = usedtime_user('prof')\n",
+    "d,h,m = splitmin(tutime)\n",
+    "print 'user:', 'prof', '\\t', d,'days', h,'hours', m, 'mins'\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "(b) Total used time by all users"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "user : da22 \t0 days 0 hours 22 mins\n",
+      "user : fp22 \t0 days 0 hours 43 mins\n",
+      "user : fp23 \t0 days 0 hours 0 mins\n",
+      "user : fp04 \t0 days 0 hours 5 mins\n",
+      "user : fp26 \t0 days 0 hours 17 mins\n",
+      "user : da14 \t0 days 0 hours 3 mins\n",
+      "user : prof \t16 days 15 hours 8 mins\n",
+      "user : da22 \t0 days 0 hours 22 mins\n"
+     ]
+    }
+   ],
+   "source": [
+    "def usedtime_users(uname=None):\n",
+    "    \n",
+    "    if uname is None:\n",
+    "        allusers = set(rec['uname'] for rec in lastlist)\n",
+    "        for user in allusers:\n",
+    "            tusedtime = 0\n",
+    "            for rec in lastlist:\n",
+    "                if user == rec['uname']:\n",
+    "                    tusedtime += rec['utime']\n",
+    "            d,h,m = splitmin(tusedtime)\n",
+    "            print 'user :', user, '\\t', d, 'days', h, 'hours', m, 'mins'\n",
+    "    else:\n",
+    "        tusedtime = 0\n",
+    "        for rec in lastlist:\n",
+    "            if uname == rec['uname']:\n",
+    "                tusedtime += rec['utime']\n",
+    "        d,h,m= splitmin(tusedtime)\n",
+    "        print 'user :', uname, '\\t', d, 'days', h, 'hours', m, 'mins'\n",
+    "\n",
+    "usedtime_users()\n",
+    "usedtime_users('da22')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "(c) Total used time by a user with period\n",
+    "-- trivial improvement on (a)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "(d) Total used time by all users with period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "user : da22 \t0 days 0 hours 0 mins\n",
+      "user : fp22 \t0 days 0 hours 43 mins\n",
+      "user : fp23 \t0 days 0 hours 0 mins\n",
+      "user : fp04 \t0 days 0 hours 5 mins\n",
+      "user : fp26 \t0 days 0 hours 17 mins\n",
+      "user : da14 \t0 days 0 hours 0 mins\n",
+      "user : prof \t0 days 0 hours 0 mins\n",
+      "user : da22 \t0 days 0 hours 22 mins\n"
+     ]
+    }
+   ],
+   "source": [
+    "def usedtime_users_period(uname=None, period=None):\n",
+    "    \n",
+    "    if uname is None:\n",
+    "        allusers = set(rec['uname'] for rec in lastlist)\n",
+    "        for user in allusers:\n",
+    "            tusedtime = 0\n",
+    "            for rec in lastlist:\n",
+    "                if user == rec['uname']:\n",
+    "                    if period is None:\n",
+    "                        tusedtime += rec['utime']\n",
+    "                    else:\n",
+    "                        if rec['date']['month'] == period:\n",
+    "                            tusedtime += rec['utime']\n",
+    "                d,h,m = splitmin(tusedtime)\n",
+    "            print 'user :', user, '\\t', d, 'days', h, 'hours', m, 'mins'\n",
+    "    else:\n",
+    "        tusedtime = 0\n",
+    "        for rec in lastlist:\n",
+    "            if uname == rec['uname']:\n",
+    "                if period is None:\n",
+    "                    tusedtime += rec['utime']\n",
+    "                else:\n",
+    "                    if rec['date']['month'] == period:\n",
+    "                        tusedtime += rec['utime']\n",
+    "                        \n",
+    "        d,h,m= splitmin(tusedtime)\n",
+    "        print 'user :', uname, '\\t', d, 'days', h, 'hours', m, 'mins'\n",
+    "\n",
+    "usedtime_users_period(period='Jun')\n",
+    "usedtime_users_period('da22', 'Apr')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
